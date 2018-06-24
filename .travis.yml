@@ -27,7 +27,7 @@ matrix:
          PRE_CMD=linux32
 
 install:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then docker pull $DOCKER_IMAGE; fi
+  - python -m pip install requirements.txt
 
 script:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then bash ./build-wheels.sh $TRAVIS_OS_NAME; fi

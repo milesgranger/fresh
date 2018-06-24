@@ -20,8 +20,7 @@ if [[ $TRAVIS_OS_NAME == "osx" ]]; then
     source ./venv/bin/activate
     export PATH=$(pwd)/venv/bin:$PATH
     echo "Python version: $(python --version)"
-    pip install -U pip setuptools setuptools-rust wheel pytest
-    install_rust nightly
+    pip install -U pip setuptools wheel pytest
     pip wheel . -w ./wheelhouse/
     pip install -v fresh --no-index -f ./wheelhouse/
     pip install -r "requirements.txt"
@@ -30,12 +29,6 @@ if [[ $TRAVIS_OS_NAME == "osx" ]]; then
 else
 
     # Build wheels with docker run --rm -v $(pwd):/io quay.io/pypa/manylinux1_x86_64 bash /io/build-wheels.sh linux
-    echo "Installing rust!"
-    mkdir ~/rust-installer
-    curl -sL https://static.rust-lang.org/rustup.sh -o ~/rust-installer/rustup.sh
-    sh ~/rust-installer/rustup.sh --prefix=~/rust --spec=nightly -y --disable-sudo
-    export PATH="$HOME/rust/bin:$PATH"
-    export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$HOME/rust/lib"
 
     # Compile wheels
     for PYBIN in /opt/python/cp{35,36}*/bin; do

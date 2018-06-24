@@ -1,7 +1,0 @@
-python:
-  - 3.5
-  - 3.6
-
-package_name: fresh
-project_slug: fresh
-project_short_description: Automated, end-to-end deep learning
