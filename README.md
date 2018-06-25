@@ -9,9 +9,10 @@ import pandas as pd
 from fresh import Model
 
 df = pd.read_csv('mydata.csv')
+target = df['my-target']
 
-model = Model(target='my-target')
-model.fit(df)
+model = Model()
+model.fit(df, target)
 
 X = pd.read_csv('new_data_without_answers.csv')
 predictions = model.predict(X)

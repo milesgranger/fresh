@@ -3,6 +3,7 @@
 import os
 import unittest
 import logging
+from pprint import pformat
 import pandas as pd
 
 from fresh import Model
@@ -27,9 +28,13 @@ class PipelineBuilderTestCase(unittest.TestCase):
         """
         Ensure datasets with NaNs can be dealt with.
         """
-        model = Model(target='species')
+        model = Model()
         self.logger.debug('Start of fitting model.')
-        model.fit(self.iris)
+        model.fit(X=self.iris[[c for c in self.iris.columns if c != 'species']],
+                  y=self.iris['species'])
+        predictions = model.predict(self.iris[[c for c in self.iris.columns if c != 'species']])
+        self.logger.info('Got predictions: {}'.format(pformat(predictions[:10])))
+
 
 
 if __name__ == '__main__':

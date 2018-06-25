@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
 
+from sklearn.base import BaseEstimator
+from fresh.pipeline import PipeBuilder
 
-class Model:
+
+class Model(BaseEstimator):
 
     target = None
+    pipeline = None
 
-    def __init__(self, target: str):
-        self.target = target
-
-    def fit(self, X):
-        raise NotImplementedError
+    def fit(self, X, y):
+        self.pipeline = PipeBuilder.from_data(X, y)
+        self.pipeline.fit(X, y)
+        return self
 
     def predict(self, X):
-        raise NotImplementedError
-
+        return self.pipeline.predict(X)
