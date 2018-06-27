@@ -6,6 +6,11 @@ from fresh.pipeline import PipeBuilder
 
 
 class Model(BaseEstimator):
+    """
+    Basically a wrapper around .pipeline which handles the actual transformation and training of the model.
+    This serves as a transparent wrapper to the raw data and following construction and training of multiple models
+    and variations to find the best one.
+    """
 
     target = None
     pipeline = None
