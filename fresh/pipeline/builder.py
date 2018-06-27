@@ -43,7 +43,6 @@ class PipeBuilder(Pipeline):
         ]
         return cls(steps=steps)
 
-
     @classmethod
     def _build_feature_union_step(cls, X: pd.DataFrame) -> FeatureUnion:
         """
@@ -55,7 +54,6 @@ class PipeBuilder(Pipeline):
         ]
         return FeatureUnion(transformer_list=transformer_list,
                             n_jobs=1)
-
 
     @staticmethod
     def _get_best_transformer(series: pd.Series, feature: str) -> Pipeline:

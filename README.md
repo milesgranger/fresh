@@ -10,6 +10,7 @@ from fresh import Model
 
 df = pd.read_csv('mydata.csv')
 target = df['my-target']
+del df['my-target']
 
 model = Model()
 model.fit(df, target)
