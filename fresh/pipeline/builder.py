@@ -6,8 +6,8 @@ import numpy as np
 from ast import literal_eval
 from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.decomposition import PCA
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.preprocessing import FunctionTransformer, Imputer
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+from sklearn.preprocessing import FunctionTransformer, Imputer, QuantileTransformer
 
 from fresh.transformers import Selector
 
@@ -37,14 +37,33 @@ class PipeBuilder(Pipeline):
         """
         Return a scikit-learn pipeline from raw dataset.
         """
+        # Determine regression or classification model
+        cls._problem_type = cls._determine_classification_or_regression(y)
+        cls._n_features = X.shape[1]
+
+        model = RandomForestClassifier(min_samples_split=25) \
+            if cls._problem_type == 'classification' \
+            else RandomForestRegressor(min_samples_split=25)
+
         # Base pipeline which should be ran through a parallelized gridsearch to swap out models, and do other
         # modifications to find the best pipeline.
         steps = [
             ('features', cls._build_feature_union_step(X)),
             ('pca', PCA(n_components=X.shape[1])),
-            ('model', RandomForestClassifier(min_samples_split=25))
+            ('qt', QuantileTransformer(output_distribution='normal')),
+            ('model', model)
         ]
         return cls(steps=steps)
+
+    @staticmethod
+    def _determine_classification_or_regression(target: np.ndarray) -> str:
+        """
+        Determine if the target is a classification or regression problem
+        """
+        if np.unique(target).shape[0] / target.shape[0] < 0.25 or isinstance(target[0], str):
+            return 'classification'
+        else:
+            return 'regression'
 
     @classmethod
     def _build_feature_union_step(cls, X: pd.DataFrame) -> FeatureUnion:
@@ -81,22 +100,29 @@ class PipeBuilder(Pipeline):
         that datatype. ie. if series contains [1, 2, 'NA', 3, 4] it will replace 'NA' with np.NaN
         """
         def attempt_conversion(array):
-
+            """
+            Function to be passed to the FunctionTransformer, convert array values to the most common
+            dtype in array.. if it can't be converted, replace with NaN
+            """
             array = array.flatten() if hasattr(array, 'flatten') else array.values.flatten()
 
             for i, val in enumerate(array):
                 try:
                     array[i] = cast_func(val)
-                except ValueError:
+                except (ValueError, TypeError):
                     array[i] = np.NaN
             return array.reshape(-1, 1)
 
         def determine_type(val):
+            """
+            Given a value, determine the type.. should a str(3) be given, will determine to be int dtype
+            """
             try:
                 return type(literal_eval(val))
             except ValueError:
                 return type(val)
 
+        # Find the most common type in the series.
         cast_func = series.map(determine_type).value_counts().index[0]
 
         return FunctionTransformer(func=attempt_conversion, validate=False)
