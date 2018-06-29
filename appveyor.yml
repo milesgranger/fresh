@@ -19,7 +19,7 @@ install:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   - "python --version"
   - pip install -r requirements.txt
-  - pip install --upgrade setuptools-rust pytest pytest-benchmark wheel
+  - pip install --upgrade pytest pytest-benchmark wheel
 
 build_script:
   - python -m pip -v wheel . -w .\\wheelhouse
