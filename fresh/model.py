@@ -26,3 +26,6 @@ class Model(BaseEstimator):
 
     def predict(self, X):
         return self.pipeline.predict(X)
+
+    def score(self, X, y, *args, **kwargs):
+        return self.pipeline.score(X, y, *args, **kwargs)

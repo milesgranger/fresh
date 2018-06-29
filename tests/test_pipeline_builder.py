@@ -17,6 +17,10 @@ class PipelineBuilderTestCase(unittest.TestCase):
 
     def test_dtype_inferences(self):
         """
+        Infer the primary dtype for a given array.
+
+        Occasionally, an array might be floats, but NaNs represented as 'N/A' or some other string/value,
+        the builder should find these and replace them with NaN values OR cast them at the primary dtype in that array
         """
 
         # Each 2nd index value should be returned as NaN or as the type of the other values
@@ -29,6 +33,8 @@ class PipelineBuilderTestCase(unittest.TestCase):
             series = pd.Series(vec_to_infer)
             transformer = PipeBuilder._get_type_transformer(series)
             array = transformer.fit_transform(series.values.reshape(-1, 1))
+
+            # The 2nd index is either NaN or the same instance type of the first element.
             self.assertTrue(pd.isna(array[2]) or isinstance(array[2][0], type(array[0][0])),
                             'Expected 2nd index to be NaN, got: "{}" instead.'.format(array[2]))
 

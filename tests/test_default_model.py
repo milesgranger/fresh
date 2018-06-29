@@ -4,7 +4,12 @@ import os
 import unittest
 import logging
 from pprint import pformat
+
 import pandas as pd
+import numpy as np
+
+from sklearn import datasets, metrics
+from sklearn.model_selection import cross_val_score
 
 from fresh import Model
 
@@ -37,7 +42,7 @@ class DefaultModelTestCase(unittest.TestCase):
             'y': iris['species']
         }
 
-    def test_all_numeric_x_string_y(self):
+    def test_all_numeric_x_string_y_classification(self):
         """
         Numeric values and string targets
         """
@@ -49,7 +54,7 @@ class DefaultModelTestCase(unittest.TestCase):
         predictions = model.predict(X)
         self.logger.debug('Got predictions: {}'.format(pformat(predictions[:2])))
 
-    def test_all_numeric_x_numeric_y(self):
+    def test_all_numeric_x_numeric_y_classification(self):
         """
         Numeric values and numeric categorical targets
         """
@@ -61,6 +66,31 @@ class DefaultModelTestCase(unittest.TestCase):
         model.fit(X, y)
         predictions = model.predict(X)
         self.logger.debug('Got predictions: {}'.format(pformat(predictions[:2])))
+
+    def test_all_numeric_x_regression(self):
+        """
+        Test basic regression
+        """
+        X, y = datasets.make_regression(n_samples=1000, n_features=50, n_informative=10)
+
+        X = pd.DataFrame(X, columns=('x_{}'.format(i) for i in range(X.shape[1])))
+        y = pd.Series(y)
+
+        # Input random NaN values
+        X = X.mask(np.random.random(X.shape) < 0.01)
+        self.logger.debug('Total null values: {}'.format(pd.isna(X).sum().sum()))
+
+        model = Model()
+        model.fit(X, y)
+        model.predict(X)
+        scores = model.score(X, y)
+        self.logger.debug('Regression avg score: {:.2f}, standard dev: {:.2f}'
+                          .format(scores.mean(), scores.std()))
+        self.assertGreaterEqual(scores.mean(), 0.5,
+                                'Expected score of default model to be >= 0.5, got {:.2f}'.format(scores.mean()))
+        self.assertLessEqual(scores.std(), 0.05,
+                             msg='Expected stable model in cross validation, got STD of: {:.2f}'.format(scores.std()))
+
 
 
 if __name__ == '__main__':
