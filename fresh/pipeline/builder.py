@@ -104,7 +104,7 @@ class PipeBuilder(Pipeline):
             Function to be passed to the FunctionTransformer, convert array values to the most common
             dtype in array.. if it can't be converted, replace with NaN
             """
-            array = array.flatten() if hasattr(array, 'flatten') else array.values.flatten()
+            array = array.squeeze() if hasattr(array, 'squeeze') else array.values.squeeze()
 
             for i, val in enumerate(array):
                 try:

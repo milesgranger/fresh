@@ -1,1 +1,1 @@
-from .builder import PipeBuilder
+from fresh.pipeline.builder import PipeBuilder

@@ -27,7 +27,7 @@ matrix:
          PRE_CMD=linux32
 
 install:
-  - python -m pip install requirements.txt
+  - echo "Nothing to install"
 
 script:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then bash ./build-wheels.sh $TRAVIS_OS_NAME; fi

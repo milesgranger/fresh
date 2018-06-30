@@ -1,2 +1,2 @@
 from ._version import __version__
-from .model import Model
+from fresh.model import Model

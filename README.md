@@ -26,6 +26,15 @@ X = pd.read_csv('new_data_without_answers.csv')
 predictions = model.predict(X)
 ```
 
+#### Install:
+```commandline
+# Via PyPI
+pip install fresh
+
+# Bleeding:
+pip install git+https://github.com/milesgranger/fresh
+
+```
 
 ---
 
